@@ -179,7 +179,7 @@ TryApiApp.controller('HomeController', [
               };
               return method.speak = function() {
                 var payload = {
-                    action: method.action
+                  action: method.action
                 }
 
                 $.each(method.parameters, function(i) {
@@ -191,7 +191,7 @@ TryApiApp.controller('HomeController', [
                   data: JSON.stringify(payload),
                   identifier: JSON.stringify(method.identifier)
                 }));
-              };
+              }
             default:
               return method.submit = function() {
                 return $scope.methodSubmit(method);

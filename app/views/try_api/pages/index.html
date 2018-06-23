@@ -113,7 +113,7 @@
                         <div class="row parameter">
                             <div class="col-md-4 text-right"></div>
                             <div class="col-md-8">
-                                {{ method.action }}
+                                {{ method.action || 'This channel is for listening only' }}
                             </div>
                         </div>
                     </div>
@@ -158,10 +158,11 @@
                             <span class="ladda-label">Connect</span><span class="ladda-spinner"></span>
                             <div class="ladda-progress" style="width: 100px"></div>
                         </button>
-                        <button class="btn btn-success ladda-button" data-color="mint" data-style="expand-right" ladda="method.pending" ng-click="method.speak()" sata-size="s" ng-show="method.connected">
+                        <button class="btn btn-success ladda-button" data-color="mint" data-style="expand-right" ladda="method.pending" ng-click="method.speak()" sata-size="s" ng-show="method.connected" ng-if="method.action">
                             <span class="ladda-label">Speak</span><span class="ladda-spinner"></span>
                             <div class="ladda-progress" style="width: 100px"></div>
                         </button>
+                        <span ng-if="method.connected && method.action == null">This channel is for listening only</span>
                     </div>
                     <br/>
                     <div class="method-example-code" id="method.payload" ng-if="method.response.payload.length > 0">
