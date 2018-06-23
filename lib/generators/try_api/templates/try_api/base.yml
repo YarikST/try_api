@@ -184,3 +184,87 @@ menu_items:
         path: '/search/:q'
         method: 'GET'
         description: 'All you need is just place your URL parameter with prepended colon (:) symbol.'
+
+  -
+    endpoint:
+      api_prefix: ''
+      host: 'localhost'
+      port: 8433
+    title: 'Action cable'
+    path: '/socket'
+    method: web_socket
+    action: run_api_test
+    cookies:
+      -
+        name: session_token
+    identifier:
+      channel: RoomsChannel
+    identifier_parameters:
+      -
+        name: 'room_id'
+        type: integer
+      -
+        name: 'object_example'
+        type: 'object'
+        parameters:
+          -
+            name: 'boolean'
+            type: 'boolean'
+          -
+            name: 'array_object_example'
+            type: 'array'
+            description: 'Yes! this is array which can include other sets of parameters.'
+            parameters:
+              -
+                name: 'id'
+                type: 'integer'
+
+      -
+        name: 'array_example'
+        type: array
+        parameters:
+          -
+            type: integer
+    parameters:
+      -
+        name: 'room_id_2'
+        type: integer
+      -
+        name: 'title'
+        type: string
+      -
+        name: 'description'
+        type: text
+        type: text
+      -
+        name: 'price'
+        type: double
+      -
+        name: 'object_ex'
+        type: 'object'
+        parameters:
+          -
+            name: 'boolean'
+            type: 'boolean'
+          -
+            name: 'array'
+            type: 'array'
+            description: 'Yes! this is array which can include other sets of parameters.'
+            parameters:
+              -
+                name: 'id'
+                type: 'integer'
+
+      -
+        name: 'array_object'
+        type: array
+        parameters:
+          -
+            name: 'a'
+            type: integer
+      -
+        name: 'array_ex'
+        type: array
+        parameters:
+          -
+            type: integer
