@@ -1,6 +1,8 @@
 module TryApi
   class Base
 
+    OBJECT_TYPE = ["endpoint"]
+
     def self.typesafe_accessor(name, type, options={})
 
       define_method(name) do
@@ -24,6 +26,16 @@ module TryApi
           else
             value = options[:default] if value.nil? && !options[:default].nil?
             instance_variable_set("@#{name}", value)
+          end
+        elsif OBJECT_TYPE.include? name.to_s
+          begin
+            class_name = options.fetch(:class_name, name).to_s.capitalize
+
+            value_object = TryApi.const_get(class_name).new value
+
+            instance_variable_set("@#{name}", value_object)
+          rescue Exception => found
+            raise TryApi::ArgumentError.new "#{ self.class.name }##{ name }=#{ value }(#{ value.class.name }). Invalid Object context"
           end
         else
           raise TryApi::ArgumentError.new "#{ self.class.name }##{ name }=#{ value }(#{ value.class.name })"

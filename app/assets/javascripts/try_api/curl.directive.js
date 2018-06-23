@@ -38,7 +38,7 @@ angular.module('TryApi').directive('curl', ['$filter', function($filter) {
                 }
             }
 
-            scope.curlString = 'curl -X ' + method + ' ' + headers.join('') + params + ' ' + scope.model.endpoint + '/' + scope.model.submit_path + urlParams;
+            scope.curlString = 'curl -X ' + method + ' ' + headers.join('') + params + ' ' + scope.model.endpoint.path + '/' + scope.model.submit_path + urlParams;
 
         }, true)
 

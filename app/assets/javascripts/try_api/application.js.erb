@@ -77,14 +77,7 @@ TryApiApp.controller('HomeController', [
           return headers[header.name] = header.value;
         });
       }
-      path = $scope.project.host;
-      if ($scope.project.protocol) {
-        path =  $scope.project.protocol + '://' + path;
-      }
-      if ($scope.project.port) {
-        path += ':' + $scope.project.port;
-      }
-      path += '/' + method.submit_path;
+      path =  method.endpoint.path + '/' + method.submit_path;
       fd = new FormData;
       switch (method.method.toLowerCase()) {
         case 'post':
@@ -119,7 +112,6 @@ TryApiApp.controller('HomeController', [
         menu_item = this;
         menu_item.methods.forEach(function(method) {
           method.pending = false;
-          method.endpoint = $scope.project.endpoint;
           method.response_handler = function(data, status, headers, config) {
             var e;
             method.pending = false;
@@ -143,14 +135,21 @@ TryApiApp.controller('HomeController', [
                 method.pending = true;
                 method.connected = false;
                 method.response = {
-                  data: []
+                  data: [],
+                  payload: [],
                 };
                 if ('WebSocket' in window) {
-                  method.ws = new WebSocket('ws://' + $scope.project.endpoint + '/' + method.submit_path);
+                  console.log(method)
+                  method.ws = new WebSocket('ws://' + method.endpoint.path + '/' + method.submit_path);
                   method.ws.onopen = function() {
                     return $scope.$apply(function() {
                       method.pending = false;
                       method.response.data.push('Connected');
+
+                      $.each(method.identifier_parameters, function(i) {
+                        return $scope.addParameterToIdentifier(method.identifier, this)
+                      });
+
                       method.ws.send(JSON.stringify({
                         command: "subscribe",
                         identifier: JSON.stringify(method.identifier)
@@ -162,7 +161,8 @@ TryApiApp.controller('HomeController', [
                   method.ws.onmessage = function(evt) {
                     return $scope.$apply(function() {
                       if (JSON.parse(evt.data).type !== 'ping') {
-                        return method.response.data.push(evt.data);
+                        console.log(evt)
+                        return method.response.payload.push(evt.data);
                       }
                     });
                   };
@@ -178,15 +178,19 @@ TryApiApp.controller('HomeController', [
                 }
               };
               return method.speak = function() {
+                var payload = {
+                    action: method.action
+                }
+
+                $.each(method.parameters, function(i) {
+                  return $scope.addParameterToIdentifier(payload, this)
+                });
+
                 method.ws.send(JSON.stringify({
                   command: "message",
-                  data: JSON.stringify({
-                    message: method.message,
-                    action: 'speak'
-                  }),
+                  data: JSON.stringify(payload),
                   identifier: JSON.stringify(method.identifier)
                 }));
-                return method.message = '';
               };
             default:
               return method.submit = function() {
@@ -271,7 +275,7 @@ TryApiApp.controller('HomeController', [
       }
       return url;
     };
-    return $scope.addParameterToUrl = function(url, parameter, path) {
+    $scope.addParameterToUrl = function(url, parameter, path) {
       if (path == null) {
         path = '';
       }
@@ -294,6 +298,50 @@ TryApiApp.controller('HomeController', [
           url = $scope.addSampleParameterToUrl(url, parameter, path);
       }
       return url;
+    };
+    $scope.addSampleParameterToIdentifier = function(identifier, parameter) {
+      var path = parameter.name
+
+      switch (parameter.type) {
+        case 'boolean':
+          identifier[path]=  parameter.value || false;
+        default:
+          if (parameter.value) {
+            identifier[path]=  parameter.value || '';
+          }
+      }
+    };
+    $scope.addArrayToIdentifier = function(identifier, parameter) {
+      var path = parameter.name
+      identifier[path]= []
+
+      $.each(parameter.values, function() {
+        var e = null
+        $.each(this, function() {
+          if (this.name != null){
+            e = {}
+            $scope.addParameterToIdentifier(e, this);
+          }else{
+           e = this.value
+          }
+        });
+        identifier[path].push(e)
+      });
+    };
+    $scope.addParameterToIdentifier = function(identifier, parameter) {
+      if (parameter.type === 'array') {
+        $scope.addArrayToIdentifier(identifier, parameter);
+      }
+      if (parameter.type === 'object') {
+        var path = parameter.name
+        var e = {}
+        $.each(parameter.values, function() {
+          $scope.addParameterToIdentifier(e, this);
+        });
+        identifier[path] = e
+      } else {
+        $scope.addSampleParameterToIdentifier(identifier, parameter);
+      }
     };
   }
 ]);

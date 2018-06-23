@@ -3,17 +3,12 @@ module TryApi
     typesafe_accessor :name, String
     typesafe_accessor :menu_items, Array, items_type: TryApi::MenuItem
     typesafe_accessor :protocol, String
-    typesafe_accessor :host, String
-    typesafe_accessor :port, Integer
-    typesafe_accessor :api_prefix, String
     typesafe_accessor :variables, Hash, {}
+    typesafe_accessor :endpoint, TryApi::Endpoint
 
     def to_json
-      super.merge endpoint: endpoint
+      super.merge endpoint: endpoint.to_json
     end
 
-    def endpoint
-      "#{ host }#{ port.blank? ? '' : (':' + port.to_s) }"
-    end
   end
 end

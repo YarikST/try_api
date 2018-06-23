@@ -22,7 +22,7 @@
             <h2 class="method-try-heading">{{ project.name }}</h2>
         </div>
         <div class="col-md-6 method-example">API endpoint
-            <div class="method-example-code">{{ project.endpoint }}</div>
+            <div class="method-example-code">{{ project.endpoint.full_path }}</div>
         </div>
     </div>
     <div ng-repeat="menu_item in project.menu_items track by menu_item.id">
@@ -108,6 +108,15 @@
                         <span class="label label-success" style="text-transform: uppercase">{{ method.method }}</span>
                         <span url=true ng-model="method.submit_path" pattern="method.local_path"></span>
                     </h4>
+                    <div>
+                        <label>Action:</label>
+                        <div class="row parameter">
+                            <div class="col-md-4 text-right"></div>
+                            <div class="col-md-8">
+                                {{ method.action }}
+                            </div>
+                        </div>
+                    </div>
                     <div ng-if="method.cookies.length > 0"><label>Identifier:</label>
                         <div class="row parameter">
                             <div class="col-md-4 text-right"></div>
@@ -128,10 +137,20 @@
                         </div>
                     </div>
                     <br/>
-                    <div class="method-example-code" id="method.response">
+                    <div ng-if="method.identifier_parameters.length > 0">
+                        <div class="params-label">Identifier parameters</div>
+                        <div ng-model="method.identifier_parameters" params=""></div>
+                    </div>
+                    <br/>
+                    <div class="method-example-code" id="method.response" ng-if="method.response.data.length > 0">
                         <div ng-repeat="data_row in method.response.data track by $index">
                             {{ data_row }}
                         </div>
+                    </div>
+                    <br/>
+                    <div ng-if="method.parameters.length > 0">
+                        <div class="params-label">Parameters</div>
+                        <div ng-model="method.parameters" params=""></div>
                     </div>
                     <br/>
                     <div class="text-right progress-demo">
@@ -139,13 +158,17 @@
                             <span class="ladda-label">Connect</span><span class="ladda-spinner"></span>
                             <div class="ladda-progress" style="width: 100px"></div>
                         </button>
-                        <textarea ng-model="method.message" placeholder="message" ng-show="method.connected" style="width: 300px"></textarea>
                         <button class="btn btn-success ladda-button" data-color="mint" data-style="expand-right" ladda="method.pending" ng-click="method.speak()" sata-size="s" ng-show="method.connected">
                             <span class="ladda-label">Speak</span><span class="ladda-spinner"></span>
                             <div class="ladda-progress" style="width: 100px"></div>
                         </button>
                     </div>
                     <br/>
+                    <div class="method-example-code" id="method.payload" ng-if="method.response.payload.length > 0">
+                        <div ng-repeat="data_row in method.response.payload track by $index">
+                            {{ data_row }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

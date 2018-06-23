@@ -8,19 +8,27 @@ module TryApi
     typesafe_accessor :path, String
     typesafe_accessor :method, String
     typesafe_accessor :example_responses, Array, items_type: TryApi::ExampleResponse
-    typesafe_accessor :api_prefix, String
     typesafe_accessor :identifier, Hash
+    typesafe_accessor :endpoint, TryApi::Endpoint
+    typesafe_accessor :identifier_parameters, Array, items_type: TryApi::Parameter
+    typesafe_accessor :action, String
 
-    def to_json(id)
-      super(id).merge local_path: local_path, full_path: full_path
+    alias_method :method_endpoint, :endpoint
+
+    def endpoint
+      method_endpoint || project.endpoint
     end
 
     def full_path
-      "#{ project.endpoint }/#{ project.api_prefix }#{ self.path }"
+      "#{endpoint.full_path}#{ self.path }"
     end
 
     def local_path
-      "/#{ self.api_prefix || self.project.api_prefix }#{ self.path }"
+      "/#{ endpoint.api_prefix }#{ self.path }"
+    end
+
+    def to_json(id)
+      super(id).merge endpoint: endpoint.to_json, full_path: full_path, local_path: local_path
     end
   end
 end
