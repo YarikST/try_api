@@ -140,7 +140,7 @@ TryApiApp.controller('HomeController', [
                 };
                 if ('WebSocket' in window) {
                   console.log(method)
-                  method.ws = new WebSocket('ws://' + method.endpoint.path + '/' + method.submit_path);
+                  method.ws = new WebSocket(method.endpoint.path + '/' + method.submit_path);
                   method.ws.onopen = function() {
                     return $scope.$apply(function() {
                       method.pending = false;
@@ -159,6 +159,7 @@ TryApiApp.controller('HomeController', [
                     });
                   };
                   method.ws.onmessage = function(evt) {
+                    console.log(evt)
                     return $scope.$apply(function() {
                       if (JSON.parse(evt.data).type !== 'ping') {
                         console.log(evt)
@@ -166,7 +167,8 @@ TryApiApp.controller('HomeController', [
                       }
                     });
                   };
-                  return method.ws.onclose = function() {
+                  return method.ws.onclose = function(evt) {
+                    console.log(evt)
                     return $scope.$apply(function() {
                       method.pending = false;
                       method.connected = false;
